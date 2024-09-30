@@ -60,6 +60,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
+
+import com.onesignal.OneSignal;
+import com.onesignal.debug.LogLevel;
+import com.onesignal.Continue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,7 +89,12 @@ public class MainActivity extends AppCompatActivity {
     //Configuration variables
     private static String Sngine_URL = SngineConfig.Sngine_URL;
     private String CURR_URL = Sngine_URL;
+
+    private String oneSignalUserID;
+
     private static String Sngine_F_TYPE = SngineConfig.Sngine_F_TYPE;
+
+    private static String Sngine_ONESIGNAL_APP_ID = SngineConfig.Sngine_ONESIGNAL_APP_ID;
 
     public static String ASWV_HOST = aswm_host(Sngine_URL);
 
@@ -157,17 +167,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.w("READ_PERM = ", Manifest.permission.READ_EXTERNAL_STORAGE);
-        Log.w("WRITE_PERM = ", Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        // OneSignal Initialization
+        if(!Objects.equals(Sngine_ONESIGNAL_APP_ID, "")) {
+        OneSignal.initWithContext(this, Sngine_ONESIGNAL_APP_ID);
+
+        // requestPermission will show the native Android notification permission prompt.
+        // NOTE: It's recommended to use a OneSignal In-App Message to prompt instead.
+        OneSignal.getNotifications().requestPermission(false, Continue.none());
+
+        // Get OneSignal user ID
+        oneSignalUserID = OneSignal.getUser().getPushSubscription().getId();
+        }
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        if(action == null){
         //Prevent the app from being started again when it is still alive in the background
         if (!isTaskRoot()) {
             finish();
             return;
         }
+        }
 
         setContentView(R.layout.activity_main);
-
         swvp_view = findViewById(R.id.msw_view);
+        swvp_view.getSettings().setJavaScriptEnabled(true);
 
         final SwipeRefreshLayout pullfresh = findViewById(R.id.pullfresh);
         if (SngineApp_PULLFRESH) {
@@ -220,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
         WebSettings webSettings = swvp_view.getSettings();
         swvp_view.getSettings().setUserAgentString("Sngine");
         swvp_view.getSettings().setMediaPlaybackRequiresUserGesture(false);
-
 
         if (!SngineApp_OFFLINE) {
             webSettings.setJavaScriptEnabled(SngineApp_JSCRIPT);
@@ -358,15 +382,9 @@ public class MainActivity extends AppCompatActivity {
         });
         if (getIntent().getData() != null) {
             String path = getIntent().getDataString();
-            /*
-            If you want to check or use specific directories or schemes or hosts
-
-            Uri data        = getIntent().getData();
-            String scheme   = data.getScheme();
-            String host     = data.getHost();
-            List<String> pr = data.getPathSegments();
-            String param1   = pr.get(0);
-            */
+            if(path != null && path.startsWith("sngine://")) {
+                path = path.replace("sngine://", "https://");
+            }
             aswm_view(path, false);
         }
     }
@@ -400,6 +418,10 @@ public class MainActivity extends AppCompatActivity {
         public void onPageFinished(WebView view, String url) {
             findViewById(R.id.msw_welcome).setVisibility(View.GONE);
             findViewById(R.id.msw_view).setVisibility(View.VISIBLE);
+            // Inject JavaScript to save the OneSignal user ID after the page has loaded
+            if (oneSignalUserID != null) {
+                swvp_view.loadUrl("javascript:saveAndroidOneSignalUserId('" + oneSignalUserID + "')");
+            }
         }
 
         //For android below API 23
@@ -463,6 +485,11 @@ public class MainActivity extends AppCompatActivity {
         if (!SngineApp_OFFLINE && !DetectConnection.isInternetAvailable(MainActivity.this)) {
             Toast.makeText(getApplicationContext(), getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
 
+        } else if (url.startsWith("sngine:")) {
+            // Replace custom scheme with actual URL
+            String newUrl = url.replace("sngine://", "https://");
+            aswm_view(newUrl, false);
+
             //Use this in a hyperlink to redirect back to default URL :: href="refresh:android"
         } else if (url.startsWith("refresh:")) {
             String ref_sch = (Uri.parse(url).toString()).replace("refresh:", "");
@@ -509,6 +536,7 @@ public class MainActivity extends AppCompatActivity {
             //Opening external URLs in android default web browser
         } else if (SngineApp_EXTURL && !aswm_host(url).equals(ASWV_HOST)) {
             aswm_view(url, true);
+
         } else {
             a = false;
         }
@@ -530,7 +558,6 @@ public class MainActivity extends AppCompatActivity {
         end = end >= 0 ? end : url.length();
         int port = url.indexOf(':', dslash);
         end = (port > 0 && port < end) ? port : end;
-        Log.w("URL Host: ", url.substring(dslash, end));
         return url.substring(dslash, end);
     }
 
@@ -582,7 +609,6 @@ public class MainActivity extends AppCompatActivity {
                         cookieManager.setCookie(Sngine_URL, "lat=" + latitude);
                         cookieManager.setCookie(Sngine_URL, "long=" + longitude);
                     }
-                    //Log.w("New Updated Location:", latitude + "," + longitude);  //enable to test dummy latitude and longitude
                     newloc = latitude + "," + longitude;
                 } else {
                     Log.w("New Updated Location:", "NULL");

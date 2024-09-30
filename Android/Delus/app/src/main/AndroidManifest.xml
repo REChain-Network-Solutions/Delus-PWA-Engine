@@ -35,7 +35,6 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature android:name="android.hardware.microphone" />
-
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -69,6 +68,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sngine" />
             </intent-filter>
         </activity>
 

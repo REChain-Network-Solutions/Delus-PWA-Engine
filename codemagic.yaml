@@ -39,4 +39,3 @@ workflows:
         api_key: $APP_STORE_CONNECT_API_KEY
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         key_id: $APP_STORE_CONNECT_KEY_ID
-        app_id: com.rechain.delus

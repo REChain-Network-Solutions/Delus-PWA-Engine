@@ -5,7 +5,7 @@ class SngineConfig {
     /* -- CONFIG VARIABLES -- */
 
     //complete URL of your Sngine website
-    static String Sngine_URL = "https://delus.site/";
+    static String Sngine_URL = "https://delus.monster/";
 
     // OneSignal APP Id
     static String Sngine_ONESIGNAL_APP_ID = "";

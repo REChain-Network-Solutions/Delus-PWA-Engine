@@ -6,8 +6,8 @@ android {
 		applicationId 'com.delus.rechain'
         minSdk 21
         targetSdk 34
-		versionCode 13
-		versionName '13'
+		versionCode 14
+		versionName '14'
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
 	}

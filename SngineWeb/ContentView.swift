@@ -9,7 +9,7 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    let urlString: String = "https://delus.site/"
+    let urlString: String = "https://delus.monster/"
     
     var body: some View {
         WebView(url: URL(string: urlString)!)

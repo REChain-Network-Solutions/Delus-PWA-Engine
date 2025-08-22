@@ -8,7 +8,7 @@ class SngineConfig {
     static String Sngine_URL = "https://delus.monster/";
 
     // OneSignal APP Id
-    static String Sngine_ONESIGNAL_APP_ID = "";
+    static String Sngine_ONESIGNAL_APP_ID = "d79f0e91-1167-42fe-8cd6-9c1149071211";
 
 
     /* -- PERMISSION VARIABLES -- */

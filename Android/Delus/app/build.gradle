@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
+    compileSdk 35
 	defaultConfig {
 		applicationId 'com.delus.rechain'
         minSdk 21
-        targetSdk 34
-		versionCode 14
-		versionName '14'
+        targetSdk 35
+		versionCode 15
+		versionName '15'
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled true
 	}
